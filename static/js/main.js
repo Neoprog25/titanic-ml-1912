@@ -1,6 +1,9 @@
 /**
  * R.M.S. TITANIC — 1912 CINEMATIC MULTI-STEP WIZARD
- * Enhanced Reactive Video & Family Logic Controller
+ * Lead UI/UX Architect Edition:
+ * - Dynamic Ticket Fare Range Constraints (£3-£512)
+ * - Strict Reactive Passenger & Family Logic
+ * - Flicker-Free Dual Video Cross-Fade
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let vB = document.getElementById('videoB');
     const sceneLabel = document.getElementById('sceneLabel');
 
-    // Boshlang'ich videoni xavfsiz ishga tushirish
     if (vA) {
         vA.muted = true;
         vA.play().catch(err => console.warn("Autoplay kutmoqda:", err));
@@ -23,26 +25,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sceneDescriptions = {
         'intro.mp4': "Sautgempton porti (R.M.S. Titanic)",
-        'passenger_boy.mp4': "Yosh yo'lovchi (Palubadagi o'g'il bola)",
-        'passenger_girl.mp4': "Yosh yo'lovchi (Palubadagi qiz bola)",
-        'passenger_man.mp4': "Erkak yo'lovchi (Dengiz manzarasi)",
-        'passenger_woman.mp4': "Ayol yo'lovchi (Paluba sayri)",
-        'passenger_elder_man.mp4': "Keksa janob (Kresloda o'tirgan Edwardian yo'lovchi)",
+        'passenger_boy.mp4': "Yosh o'g'il bola (Gazetachi bola)",
+        'passenger_girl.mp4': "Yosh qiz bola (Titanic palubasida)",
+        'passenger_man.mp4': "O'rta yoshli erkak yo'lovchi",
+        'passenger_woman.mp4': "O'rta yoshli ayol yo'lovchi",
+        'passenger_elder_man.mp4': "Keksa janob (Kresloda o'tirgan bobo)",
         'passenger_elder_woman.mp4': "Keksa xonim (Titanic palubasidagi buvi)",
+        'elder_couple.mp4': "Keksa juftlik (Bobo va buvi birga)",
+        'elder_man_family.mp4': "Keksa bobo (Oilasi va nevaralari bilan)",
+        'elder_woman_family.mp4': "Keksa buvi (Oilasi va nevaralari bilan)",
+        'couple.mp4': "Yosh juftlik (Edwardian er-xotin)",
+        'family.mp4': "Umumiy oila va bolalar choyxo'rligi",
+        'alone.mp4': "Yolg'iz yo'lovchi (Kema panjarasida)",
         'class1.mp4': "1-klass: Hashamatli Grand Staircase zali",
         'class2.mp4': "2-klass: O'rta toifa kutubxonasi",
         'class3.mp4': "3-klass: Quyi tor Steerage yo'lagi",
-        'alone.mp4': "Yolg'iz sayohatchi (Kema panjarasida)",
-        'couple.mp4': "Juftlik / Hamrohlar (Palubadagi er-xotin)",
-        'family.mp4': "Oila va bolalar (Palubada choyxo'rlik)",
-        'boarding.mp4': "Bortga chiqish (Kemaga ko'tarilish yo'lagi)",
+        'boarding.mp4': "Bortga chiqish (Kemaga ko'tarilish trapi)",
         'fate.mp4': "Muzdek Shimoliy Atlantika okeani (15-aprel, 1912)"
     };
 
     function crossFadeToVideo(videoPathOrName) {
         if (!currentNextEl || !currentActiveEl) return;
 
-        // Pathni to'g'rilash
         let targetPath = videoPathOrName;
         if (!targetPath.startsWith('/static/videos/')) {
             targetPath = `/static/videos/${videoPathOrName}`;
@@ -56,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const filename = targetPath.split('/').pop();
 
-        // Sahna tavsif matnini silliq yangilash
         if (sceneLabel && sceneDescriptions[filename]) {
             sceneLabel.style.opacity = '0';
             setTimeout(() => {
@@ -85,12 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentActiveEl.classList.remove('active-video');
                 currentActiveEl.classList.add('next-video');
 
-                // Elementlarni almashtirish
                 const temp = currentActiveEl;
                 currentActiveEl = currentNextEl;
                 currentNextEl = temp;
             }).catch(err => {
-                console.warn("Autoplay / play ruxsati:", err);
+                console.warn("Autoplay policy handled:", err);
                 currentNextEl.classList.remove('next-video');
                 currentNextEl.classList.add('active-video');
 
@@ -106,18 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
         currentNextEl.addEventListener('canplay', performSwap);
         currentNextEl.addEventListener('loadeddata', performSwap);
 
-        // Fallback: 800ms dan so'ng almashtirish
         setTimeout(() => {
             if (!hasSwapped) performSwap();
         }, 800);
     }
 
     // -------------------------------------------------------------
-    // 2. VIDEO TANLASH MANTIQIY FUNKSIYALARI (1 va 3-BOSQICHLAR)
+    // 2. VIDEO TANLASHNING ANIQ VA QAT'IY MANTIQI
     // -------------------------------------------------------------
-    function getPassengerVideo(gender, age) {
+
+    // 1-qadam va Yolg'iz yo'lovchi uchun umumiy funksiya
+    function getPassengerBaseVideo(gender, age) {
         const isMale = (gender === 'male' || gender === 'Erkak' || gender.toLowerCase().includes('erkak'));
-        
+
         if (age < 14) {
             return isMale ? '/static/videos/passenger_boy.mp4' : '/static/videos/passenger_girl.mp4';
         } else if (age >= 55) {
@@ -127,20 +130,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function getFamilyVideo(sibsp, parch) {
-        // sibsp: Turmush o'rtoq / aka-singillar
-        // parch: Farzandlar / ota-ona
-        if (sibsp === 0 && parch === 0) {
-            return '/static/videos/alone.mp4';
-        } else if (sibsp > 0 && parch === 0) {
-            return '/static/videos/couple.mp4'; // Juftlik / aka-singil
-        } else {
-            return '/static/videos/family.mp4'; // Bolalar yoki ota-onali oila
+    // 3-qadam: Hamrohlar va Oila bo'limi uchun aniq video mantiqi
+    function getFamilyStepVideo(gender, age, sibsp, parch) {
+        const totalCompanions = sibsp + parch;
+        const isElder = (age >= 55);
+        const isMale = (gender === 'male' || gender === 'Erkak' || gender.toLowerCase().includes('erkak'));
+
+        // QOIDA 1: Agar yolg'iz bo'lsa (0 hamroh), 1-bosqichda kim kiritilgan bo'lsa O'SHANING O'ZI chiqadi!
+        if (totalCompanions === 0) {
+            return getPassengerBaseVideo(gender, age);
+        }
+
+        // QOIDA 2: Agar jami 1 ta hamroh bo'lsa (Juftlik)
+        if (totalCompanions === 1) {
+            if (isElder) {
+                return '/static/videos/elder_couple.mp4'; // Keksa bobo va buvi birga
+            } else {
+                return '/static/videos/couple.mp4'; // Yosh juftlik
+            }
+        }
+
+        // QOIDA 3: Agar 1 tadan ko'p hamroh bo'lsa (Oila)
+        if (totalCompanions > 1) {
+            if (isElder) {
+                return isMale 
+                    ? '/static/videos/elder_man_family.mp4'    // Bobo o'z oilasi/nevaralari bilan
+                    : '/static/videos/elder_woman_family.mp4';  // Buvi o'z oilasi/nevaralari bilan
+            } else {
+                return '/static/videos/family.mp4'; // Umumiy oila
+            }
         }
     }
 
     // -------------------------------------------------------------
-    // 3. WIZARD BOSHQARUVI
+    // 3. CHIPTA NARXI CHEGARALARI VA VALIDATSIYASI (FARE CONSTRAINTS)
+    // -------------------------------------------------------------
+    const fareLimits = {
+        1: { min: 30.0, max: 512.0, default: 65.0, hint: "1-klass narx chegarasi: £30.0 — £512.0 (Standart: £65.0)" },
+        2: { min: 12.0, max: 30.0, default: 16.0, hint: "2-klass narx chegarasi: £12.0 — £30.0 (Standart: £16.0)" },
+        3: { min: 3.0, max: 12.0, default: 7.5, hint: "3-klass narx chegarasi: £3.0 — £12.0 (Standart: £7.5)" }
+    };
+
+    function updateFareConstraints(pclass) {
+        const config = fareLimits[pclass];
+        if (!config) return;
+
+        pFare.min = config.min;
+        pFare.max = config.max;
+        pFare.step = 0.5;
+        pFare.value = config.default;
+        pFareVal.textContent = `£ ${config.default.toFixed(1)}`;
+
+        const hintEl = document.getElementById('fareLimitHint');
+        if (hintEl) hintEl.textContent = config.hint;
+    }
+
+    // -------------------------------------------------------------
+    // 4. FORMA VA WIZARD BOSHQARUVI
     // -------------------------------------------------------------
     let currentStep = 0;
     const totalSteps = 5;
@@ -178,18 +224,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateVideoForCurrentStep() {
+        const age = parseInt(pAge.value) || 28;
+        const gender = pSex.value;
+        const sibsp = parseInt(pSibsp.value) || 0;
+        const parch = parseInt(pParch.value) || 0;
+
         switch (currentStep) {
             case 0:
                 crossFadeToVideo('/static/videos/intro.mp4');
                 break;
             case 1:
-                crossFadeToVideo(getPassengerVideo(pSex.value, parseInt(pAge.value) || 28));
+                crossFadeToVideo(getPassengerBaseVideo(gender, age));
                 break;
             case 2:
                 crossFadeToVideo(getClassVideo());
                 break;
             case 3:
-                crossFadeToVideo(getFamilyVideo(parseInt(pSibsp.value) || 0, parseInt(pParch.value) || 0));
+                crossFadeToVideo(getFamilyStepVideo(gender, age, sibsp, parch));
                 break;
             case 4:
                 crossFadeToVideo('/static/videos/boarding.mp4');
@@ -227,14 +278,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 4. HODISALAR (EVENT LISTENERS)
+    // 5. HODISALAR (EVENT LISTENERS)
     // -------------------------------------------------------------
-    // 1-bosqich: Yosh va Jins o'zgarganda
+    // 1-bosqich: Yosh va Jins o'zgarishi
     function handlePassengerIdentityChange() {
         const age = parseInt(pAge.value) || 28;
         pAgeVal.textContent = `${age} yosh`;
         if (currentStep === 1) {
-            crossFadeToVideo(getPassengerVideo(pSex.value, age));
+            crossFadeToVideo(getPassengerBaseVideo(pSex.value, age));
         }
     }
 
@@ -251,23 +302,15 @@ document.addEventListener('DOMContentLoaded', () => {
         handlePassengerIdentityChange();
     });
 
-    // 2-bosqich: Klass tanlash
+    // 2-bosqich: Klass tanlash va Narx validatsiyasi
     classOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             classOptions.forEach(o => o.classList.remove('active'));
             opt.classList.add('active');
             selectedClass = parseInt(opt.getAttribute('data-pclass'));
 
-            if (selectedClass === 1) {
-                pFare.value = 75;
-                pFareVal.textContent = '£ 75.0';
-            } else if (selectedClass === 2) {
-                pFare.value = 25;
-                pFareVal.textContent = '£ 25.0';
-            } else {
-                pFare.value = 9;
-                pFareVal.textContent = '£ 9.0';
-            }
+            // Chipta narxi slayderi chegaralari va standart qiymatini cheklash
+            updateFareConstraints(selectedClass);
 
             if (currentStep === 2) {
                 crossFadeToVideo(getClassVideo());
@@ -279,21 +322,24 @@ document.addEventListener('DOMContentLoaded', () => {
         pFareVal.textContent = `£ ${parseFloat(e.target.value).toFixed(1)}`;
     });
 
-    // 3-bosqich: Oila a'zolari (SibSp va Parch)
+    // 3-bosqich: Hamrohlar (SibSp va Parch)
     function handleFamilyInputChange() {
         const sibsp = parseInt(pSibsp.value) || 0;
         const parch = parseInt(pParch.value) || 0;
+        const total = sibsp + parch + 1;
+        const age = parseInt(pAge.value) || 28;
+        const gender = pSex.value;
 
         if (sibsp === 0 && parch === 0) {
-            familyStatusBadge.innerHTML = '<span>👤 Sayohat holati:</span> <strong>Yolg\'iz sayohatchi</strong>';
+            familyStatusBadge.innerHTML = '<span>👤 Sayohat holati:</span> <strong>Yolg\'iz sayohatchi (1 kishi)</strong>';
         } else if (sibsp > 0 && parch === 0) {
-            familyStatusBadge.innerHTML = `<span>👫 Sayohat holati:</span> <strong>Juftlik / Hamrohlar (${sibsp + 1} kishi)</strong>`;
+            familyStatusBadge.innerHTML = `<span>👫 Sayohat holati:</span> <strong>Juftlik / Hamroh (${sibsp + 1} kishi)</strong>`;
         } else {
-            familyStatusBadge.innerHTML = `<span>👨‍👩‍👧‍👦 Sayohat holati:</span> <strong>Oila va bolalar (${sibsp + parch + 1} kishi)</strong>`;
+            familyStatusBadge.innerHTML = `<span>👨‍👩‍👧‍👦 Sayohat holati:</span> <strong>Oila va bolalar (${total} kishi)</strong>`;
         }
 
         if (currentStep === 3) {
-            crossFadeToVideo(getFamilyVideo(sibsp, parch));
+            crossFadeToVideo(getFamilyStepVideo(gender, age, sibsp, parch));
         }
     }
 
@@ -327,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 5. NAVIGATION BUTTONS
+    // 6. NAVIGATION BUTTONS
     // -------------------------------------------------------------
     document.getElementById('btnStartWizard').addEventListener('click', () => goToStep(1));
     document.getElementById('btnBackTo0').addEventListener('click', () => goToStep(0));
@@ -345,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -------------------------------------------------------------
-    // 6. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
+    // 7. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
     // -------------------------------------------------------------
     const btnCalculateFate = document.getElementById('btnCalculateFate');
     const stampSealBadge = document.getElementById('stampSealBadge');
