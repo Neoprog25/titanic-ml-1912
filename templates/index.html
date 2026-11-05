@@ -142,7 +142,7 @@
                 <div class="class-card-body">
                     <div class="class-card-header">
                         <span class="class-name">1-KLASS (FIRST)</span>
-                        <span class="class-price">£30 – £512</span>
+                        <span class="class-price">£35.1 – £512</span>
                     </div>
                     <p class="class-desc">Hashamatli suite, Grand Staircase va yuqori qayiq palubasi.</p>
                 </div>
@@ -153,7 +153,7 @@
                 <div class="class-card-body">
                     <div class="class-card-header">
                         <span class="class-name">2-KLASS (SECOND)</span>
-                        <span class="class-price">£12 – £30</span>
+                        <span class="class-price">£15.1 – £35</span>
                     </div>
                     <p class="class-desc">O'rta qatlam kutubxonasi va keng sayr palubasi.</p>
                 </div>
@@ -164,20 +164,24 @@
                 <div class="class-card-body">
                     <div class="class-card-header">
                         <span class="class-name">3-KLASS (STEERAGE)</span>
-                        <span class="class-price">£3 – £12</span>
+                        <span class="class-price">£3 – £15</span>
                     </div>
                     <p class="class-desc">Quyi umumiy paluba, tor yo'laklar va arzon chipta.</p>
                 </div>
             </label>
         </div>
 
+        <!-- Yashirin sinxronizatsiya maydonlari -->
+        <input type="hidden" id="pclass" name="pclass" value="3">
+        <input type="hidden" id="fare" name="fare" value="9.0">
+
         <div class="form-group mt-3">
             <div class="slider-row">
                 <label for="pFare">Chipta narxi (£ Fare):</label>
-                <span class="slider-val" id="pFareVal">£ 7.5</span>
+                <span class="slider-val" id="pFareVal">£ 9.0</span>
             </div>
-            <input type="range" id="pFare" min="3.0" max="12.0" step="0.5" value="7.5">
-            <small class="hint-text" id="fareLimitHint">3-klass narx chegarasi: £3.0 — £12.0</small>
+            <input type="range" id="pFare" min="3.0" max="512.0" step="0.5" value="9.0">
+            <small class="hint-text" id="fareLimitHint">3-klass narx chegarasi: £3.0 — £15.0 (Standart: £9.0)</small>
         </div>
 
         <div class="wizard-nav-btns">

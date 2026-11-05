@@ -1,14 +1,14 @@
 /**
  * R.M.S. TITANIC — 1912 CINEMATIC MULTI-STEP WIZARD
  * Lead UI/UX Architect Edition:
- * - Dynamic Ticket Fare Range Constraints (£3-£512)
+ * - Full Two-Way Reactive Binding (Travel Class <-> Ticket Fare Slider)
  * - Strict Reactive Passenger & Family Logic
- * - Flicker-Free Dual Video Cross-Fade
+ * - Flicker-Free Dual Video Cross-Fade Engine
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------
-    // 1. IKKI QAVATLI CROSS-FADE VIDEO ENGINE (Flicker-Free)
+    // 1. DOM ELEMENTLAR VA HOLAT O'ZGARUVCHILARI
     // -------------------------------------------------------------
     let vA = document.getElementById('videoA');
     let vB = document.getElementById('videoB');
@@ -23,6 +23,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentNextEl = vB;
     let lastLoadedVideoPath = '/static/videos/intro.mp4';
 
+    let currentStep = 0;
+    const totalSteps = 5;
+
+    const wizardSteps = [
+        document.getElementById('step0'),
+        document.getElementById('step1'),
+        document.getElementById('step2'),
+        document.getElementById('step3'),
+        document.getElementById('step4'),
+        document.getElementById('step5')
+    ];
+
+    const stepDots = document.querySelectorAll('.step-dot');
+
+    const pName = document.getElementById('pName');
+    const pTitle = document.getElementById('pTitle');
+    const pSex = document.getElementById('pSex');
+    const pAge = document.getElementById('pAge');
+    const pAgeVal = document.getElementById('pAgeVal');
+    const pFare = document.getElementById('pFare');
+    const pFareVal = document.getElementById('pFareVal');
+    const pSibsp = document.getElementById('pSibsp');
+    const pParch = document.getElementById('pParch');
+    const pEmbarked = document.getElementById('pEmbarked');
+    const classOptions = document.querySelectorAll('.class-option');
+    const familyStatusBadge = document.getElementById('familyStatusBadge');
+
+    let selectedClass = 3;
+    let isSyncing = false;
+
+    // -------------------------------------------------------------
+    // 2. VIDEO SAHNALAR TAVSIFI VA KROSS-FEYD ENGINE
+    // -------------------------------------------------------------
     const sceneDescriptions = {
         'intro.mp4': "Sautgempton porti (R.M.S. Titanic)",
         'passenger_boy.mp4': "Yosh o'g'il bola (Gazetachi bola)",
@@ -114,10 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 2. VIDEO TANLASHNING ANIQ VA QAT'IY MANTIQI
+    // 3. YO'LOVCHI VA OILA VIDEO MANTIQI (1 va 3-BOSQICHLAR)
     // -------------------------------------------------------------
-
-    // 1-qadam va Yolg'iz yo'lovchi uchun umumiy funksiya
     function getPassengerBaseVideo(gender, age) {
         const isMale = (gender === 'male' || gender === 'Erkak' || gender.toLowerCase().includes('erkak'));
 
@@ -130,13 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3-qadam: Hamrohlar va Oila bo'limi uchun aniq video mantiqi
     function getFamilyStepVideo(gender, age, sibsp, parch) {
         const totalCompanions = sibsp + parch;
         const isElder = (age >= 55);
         const isMale = (gender === 'male' || gender === 'Erkak' || gender.toLowerCase().includes('erkak'));
 
-        // QOIDA 1: Agar yolg'iz bo'lsa (0 hamroh), 1-bosqichda kim kiritilgan bo'lsa O'SHANING O'ZI chiqadi!
+        // QOIDA 1: Agar yolg'iz bo'lsa (0 hamroh), 1-bosqichdagi yo'lovchining aynan o'zi ko'rsatiladi
         if (totalCompanions === 0) {
             return getPassengerBaseVideo(gender, age);
         }
@@ -144,9 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // QOIDA 2: Agar jami 1 ta hamroh bo'lsa (Juftlik)
         if (totalCompanions === 1) {
             if (isElder) {
-                return '/static/videos/elder_couple.mp4'; // Keksa bobo va buvi birga
+                return '/static/videos/elder_couple.mp4';
             } else {
-                return '/static/videos/couple.mp4'; // Yosh juftlik
+                return '/static/videos/couple.mp4';
             }
         }
 
@@ -154,68 +184,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalCompanions > 1) {
             if (isElder) {
                 return isMale 
-                    ? '/static/videos/elder_man_family.mp4'    // Bobo o'z oilasi/nevaralari bilan
-                    : '/static/videos/elder_woman_family.mp4';  // Buvi o'z oilasi/nevaralari bilan
+                    ? '/static/videos/elder_man_family.mp4'
+                    : '/static/videos/elder_woman_family.mp4';
             } else {
-                return '/static/videos/family.mp4'; // Umumiy oila
+                return '/static/videos/family.mp4';
             }
         }
     }
 
     // -------------------------------------------------------------
-    // 3. CHIPTA NARXI CHEGARALARI VA VALIDATSIYASI (FARE CONSTRAINTS)
+    // 4. KLASS VA CHIPTA NARXI: IKKI TOMONLAMA SINXRONIZATSIYA (TWO-WAY BINDING)
     // -------------------------------------------------------------
-    const fareLimits = {
-        1: { min: 30.0, max: 512.0, default: 65.0, hint: "1-klass narx chegarasi: £30.0 — £512.0 (Standart: £65.0)" },
-        2: { min: 12.0, max: 30.0, default: 16.0, hint: "2-klass narx chegarasi: £12.0 — £30.0 (Standart: £16.0)" },
-        3: { min: 3.0, max: 12.0, default: 7.5, hint: "3-klass narx chegarasi: £3.0 — £12.0 (Standart: £7.5)" }
+    const classConfigs = {
+        1: {
+            name: "1-klass",
+            min: 35.1,
+            max: 512.0,
+            default: 75.0,
+            video: '/static/videos/class1.mp4',
+            hint: "1-klass narx chegarasi: £35.1 — £512.0 (Standart: £75.0)"
+        },
+        2: {
+            name: "2-klass",
+            min: 15.0,
+            max: 35.0,
+            default: 25.0,
+            video: '/static/videos/class2.mp4',
+            hint: "2-klass narx chegarasi: £15.0 — £35.0 (Standart: £25.0)"
+        },
+        3: {
+            name: "3-klass",
+            min: 3.0,
+            max: 15.0,
+            default: 9.0,
+            video: '/static/videos/class3.mp4',
+            hint: "3-klass narx chegarasi: £3.0 — £15.0 (Standart: £9.0)"
+        }
     };
 
-    function updateFareConstraints(pclass) {
-        const config = fareLimits[pclass];
-        if (!config) return;
-
-        pFare.min = config.min;
-        pFare.max = config.max;
-        pFare.step = 0.5;
-        pFare.value = config.default;
-        pFareVal.textContent = `£ ${config.default.toFixed(1)}`;
-
-        const hintEl = document.getElementById('fareLimitHint');
-        if (hintEl) hintEl.textContent = config.hint;
+    function determineClassFromFare(fare) {
+        if (fare < 15.0) return 3;
+        if (fare <= 35.0) return 2;
+        return 1;
     }
-
-    // -------------------------------------------------------------
-    // 4. FORMA VA WIZARD BOSHQARUVI
-    // -------------------------------------------------------------
-    let currentStep = 0;
-    const totalSteps = 5;
-
-    const wizardSteps = [
-        document.getElementById('step0'),
-        document.getElementById('step1'),
-        document.getElementById('step2'),
-        document.getElementById('step3'),
-        document.getElementById('step4'),
-        document.getElementById('step5')
-    ];
-
-    const stepDots = document.querySelectorAll('.step-dot');
-
-    const pName = document.getElementById('pName');
-    const pTitle = document.getElementById('pTitle');
-    const pSex = document.getElementById('pSex');
-    const pAge = document.getElementById('pAge');
-    const pAgeVal = document.getElementById('pAgeVal');
-    const pFare = document.getElementById('pFare');
-    const pFareVal = document.getElementById('pFareVal');
-    const pSibsp = document.getElementById('pSibsp');
-    const pParch = document.getElementById('pParch');
-    const pEmbarked = document.getElementById('pEmbarked');
-    const classOptions = document.querySelectorAll('.class-option');
-    const familyStatusBadge = document.getElementById('familyStatusBadge');
-
-    let selectedClass = 3;
 
     function getClassVideo() {
         if (selectedClass === 1) return '/static/videos/class1.mp4';
@@ -223,6 +234,82 @@ document.addEventListener('DOMContentLoaded', () => {
         return '/static/videos/class3.mp4';
     }
 
+    function updateClassUI(targetClass, triggerVideo = true) {
+        selectedClass = targetClass;
+
+        // Kartochkalar faolligini va radio inputni sinxronlash
+        classOptions.forEach(opt => {
+            const optClass = parseInt(opt.getAttribute('data-pclass'));
+            const radio = opt.querySelector('input[type="radio"]');
+            if (optClass === targetClass) {
+                opt.classList.add('active');
+                if (radio) radio.checked = true;
+            } else {
+                opt.classList.remove('active');
+                if (radio) radio.checked = false;
+            }
+        });
+
+        // Hint matnini yangilash
+        const hintEl = document.getElementById('fareLimitHint');
+        if (hintEl && classConfigs[targetClass]) {
+            hintEl.textContent = classConfigs[targetClass].hint;
+        }
+
+        // Yashirin form maydonini yangilash
+        const hiddenPclass = document.getElementById('pclass');
+        if (hiddenPclass) hiddenPclass.value = targetClass;
+
+        // Agar 2-bosqichda bo'lsa, mos klass videosiga silliq o'tish
+        if (triggerVideo && currentStep === 2) {
+            crossFadeToVideo(classConfigs[targetClass].video);
+        }
+    }
+
+    function handleClassCardClick(targetClass) {
+        if (isSyncing) return;
+        isSyncing = true;
+
+        const config = classConfigs[targetClass];
+        if (config) {
+            // Slayder va ko'rsatkichni standart narxga o'tkazish
+            pFare.value = config.default;
+            pFareVal.textContent = `£ ${config.default.toFixed(1)}`;
+
+            const hiddenFare = document.getElementById('fare');
+            if (hiddenFare) hiddenFare.value = config.default;
+
+            updateClassUI(targetClass, true);
+        }
+
+        isSyncing = false;
+    }
+
+    function handleFareSliderInput() {
+        if (isSyncing) return;
+        isSyncing = true;
+
+        const fare = parseFloat(pFare.value) || 9.0;
+        pFareVal.textContent = `£ ${fare.toFixed(1)}`;
+
+        const hiddenFare = document.getElementById('fare');
+        if (hiddenFare) hiddenFare.value = fare;
+
+        const newClass = determineClassFromFare(fare);
+        if (newClass !== selectedClass) {
+            // Narx boshqa klass oralig'iga o'tganda kartochka va video avtomatik o'zgaradi
+            updateClassUI(newClass, true);
+        } else {
+            const hiddenPclass = document.getElementById('pclass');
+            if (hiddenPclass) hiddenPclass.value = selectedClass;
+        }
+
+        isSyncing = false;
+    }
+
+    // -------------------------------------------------------------
+    // 5. WIZARD QADAMLARI BOSHQARUVI
+    // -------------------------------------------------------------
     function updateVideoForCurrentStep() {
         const age = parseInt(pAge.value) || 28;
         const gender = pSex.value;
@@ -278,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 5. HODISALAR (EVENT LISTENERS)
+    // 6. HODISALAR (EVENT LISTENERS)
     // -------------------------------------------------------------
     // 1-bosqich: Yosh va Jins o'zgarishi
     function handlePassengerIdentityChange() {
@@ -302,25 +389,16 @@ document.addEventListener('DOMContentLoaded', () => {
         handlePassengerIdentityChange();
     });
 
-    // 2-bosqich: Klass tanlash va Narx validatsiyasi
+    // 2-bosqich: Klass tanlash va Narx ikki tomonlama reaktivligi
     classOptions.forEach(opt => {
         opt.addEventListener('click', () => {
-            classOptions.forEach(o => o.classList.remove('active'));
-            opt.classList.add('active');
-            selectedClass = parseInt(opt.getAttribute('data-pclass'));
-
-            // Chipta narxi slayderi chegaralari va standart qiymatini cheklash
-            updateFareConstraints(selectedClass);
-
-            if (currentStep === 2) {
-                crossFadeToVideo(getClassVideo());
-            }
+            const targetClass = parseInt(opt.getAttribute('data-pclass'));
+            handleClassCardClick(targetClass);
         });
     });
 
-    pFare.addEventListener('input', (e) => {
-        pFareVal.textContent = `£ ${parseFloat(e.target.value).toFixed(1)}`;
-    });
+    pFare.addEventListener('input', handleFareSliderInput);
+    pFare.addEventListener('change', handleFareSliderInput);
 
     // 3-bosqich: Hamrohlar (SibSp va Parch)
     function handleFamilyInputChange() {
@@ -373,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 6. NAVIGATION BUTTONS
+    // 7. NAVIGATION BUTTONS
     // -------------------------------------------------------------
     document.getElementById('btnStartWizard').addEventListener('click', () => goToStep(1));
     document.getElementById('btnBackTo0').addEventListener('click', () => goToStep(0));
@@ -391,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -------------------------------------------------------------
-    // 7. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
+    // 8. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
     // -------------------------------------------------------------
     const btnCalculateFate = document.getElementById('btnCalculateFate');
     const stampSealBadge = document.getElementById('stampSealBadge');
@@ -485,4 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resProb.textContent = `${current.toFixed(1)}%`;
         }, stepTime);
     }
+
+    // Boshlang'ich holatni to'g'ri o'rnatish
+    updateClassUI(3, false);
 });
