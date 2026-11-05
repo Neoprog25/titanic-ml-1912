@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R.M.S. Titanic — Kinematografik Taqdir Tajribasi (1912)</title>
+    <!-- Google Fonts: Cinzel, Playfair Display, Old Standard TT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ==============================================================
+     SEAMLESS CROSS-FADE KINEMATIK VIDEO FON (IKKI QAVATLI)
+     ============================================================== -->
+<div class="video-container">
+  <video id="videoA" class="bg-video active-video" autoplay muted loop playsinline preload="auto">
+    <source src="{{ url_for('static', filename='videos/intro.mp4') }}" type="video/mp4">
+  </video>
+  <video id="videoB" class="bg-video next-video" muted loop playsinline preload="auto"></video>
+  <div class="cinematic-overlay"></div>
+</div>
+
+<!-- ==============================================================
+     CHAP TOMONDAGI ATMOSFERA VA BRENDING (75% OCHIQ MAYDON)
+     ============================================================== -->
+<aside class="cinema-brand-left">
+    <div class="brand-crest">
+        <svg class="brand-flag" width="48" height="32" viewBox="0 0 120 80">
+            <polygon points="0,0 120,40 0,80" fill="#b91c1c" />
+            <polygon points="40,24 43,35 54,35 45,41 48,52 40,46 32,52 35,41 26,35 37,35" fill="#ffffff" />
+        </svg>
+        <span class="brand-tag">WHITE STAR LINE</span>
+    </div>
+    <h1 class="cinema-title">R.M.S. TITANIC</h1>
+    <p class="cinema-motto">Southampton ➔ New York • 10 April 1912</p>
+
+    <!-- Jonli Manzara Ko'rsatkichi -->
+    <div class="scene-pill" id="scenePill">
+        <span class="live-pulse"></span>
+        <span id="sceneLabel">Sautgempton porti (R.M.S. Titanic)</span>
+    </div>
+</aside>
+
+<!-- ==============================================================
+     SUZUVCHI O'NG PANEL: MULTI-STEP WIZARD (FLOATING SIDEBAR)
+     ============================================================== -->
+<section class="floating-wizard-panel" id="wizardPanel">
+    
+    <!-- Wizard Progress Bar (Bosqichlar) -->
+    <div class="wizard-progress-bar">
+        <div class="step-dot active" data-step="0" title="Kirish"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="1" title="Shaxs"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="2" title="Klass"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="3" title="Oila"></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="4" title="Port"></div>
+    </div>
+
+    <!-- 0-BOSQICH: INTRO -->
+    <div class="wizard-step active" id="step0">
+        <div class="step-header">
+            <span class="ticket-header-code">PASSENGER CONTRACT TICKET</span>
+            <h2 class="step-title">Taqdiringizni Sinang</h2>
+            <div class="gold-ornament">❖ ❖ ❖</div>
+        </div>
+        <p class="step-intro-desc">
+            1912-yil 10-aprel. Insoniyat tarixidagi eng mahobatli kema — <strong>R.M.S. Titanic</strong> o'zining ilk safariga otlanmoqda.
+        </p>
+        <div class="vintage-quote-box">
+            "Xush kelibsiz, yo'lovchi. Bortga chiqish kartangizni to'ldiring va muzdek Atlantika suvlari qarshisidagi taqdiringizni bilib oling..."
+        </div>
+        <button type="button" class="btn-primary w-100" id="btnStartWizard">
+            <span>BORTGA CHIQISH (EMBARK)</span>
+            <span class="arrow-icon">➔</span>
+        </button>
+    </div>
+
+    <!-- 1-BOSQICH: YO'LOVCHI SHAXSI -->
+    <div class="wizard-step" id="step1">
+        <div class="step-header">
+            <span class="step-badge">1 / 4-qadam</span>
+            <h2 class="step-title">Yo'lovchi Shaxsi</h2>
+        </div>
+
+        <div class="form-group">
+            <label for="pName">Yo'lovchi Ismi:</label>
+            <input type="text" id="pName" value="Janob Aleksandr Smit" placeholder="Ism-sharifingiz">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="pTitle">Unvon (Title):</label>
+                <select id="pTitle">
+                    <option value="Mr" selected>Janob (Mr)</option>
+                    <option value="Mrs">Xonim (Mrs)</option>
+                    <option value="Miss">Qiz bola (Miss)</option>
+                    <option value="Master">Kichik janob (Master)</option>
+                    <option value="Lord">Lord / Zodagon</option>
+                    <option value="Doctor">Doktor / Ruhoniy</option>
+                </select>
+            </div>
+            <div class="form-group col-6">
+                <label for="pSex">Jinsi:</label>
+                <select id="pSex">
+                    <option value="male" selected>Erkak</option>
+                    <option value="female">Ayol</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="slider-row">
+                <label for="pAge">Yoshi (Age):</label>
+                <span class="slider-val" id="pAgeVal">28 yosh</span>
+            </div>
+            <input type="range" id="pAge" min="1" max="80" value="28">
+            <small class="hint-text">14 yoshgacha bolalar, 55+ yosh keksalar toifasi</small>
+        </div>
+
+        <div class="wizard-nav-btns">
+            <button type="button" class="btn-secondary" id="btnBackTo0">⬅ Orqaga</button>
+            <button type="button" class="btn-primary" id="btnToStep2">Davom etish ➔</button>
+        </div>
+    </div>
+
+    <!-- 2-BOSQICH: SAYOHAT KLASSI -->
+    <div class="wizard-step" id="step2">
+        <div class="step-header">
+            <span class="step-badge">2 / 4-qadam</span>
+            <h2 class="step-title">Sayohat Klassi</h2>
+        </div>
+
+        <div class="class-cards-group">
+            <label class="class-option" data-pclass="1">
+                <input type="radio" name="pclassRadio" value="1">
+                <div class="class-card-body">
+                    <div class="class-card-header">
+                        <span class="class-name">1-KLASS (FIRST)</span>
+                        <span class="class-price">~£75</span>
+                    </div>
+                    <p class="class-desc">Hashamatli suite, Grand Staircase va yuqori qayiq palubasi.</p>
+                </div>
+            </label>
+
+            <label class="class-option" data-pclass="2">
+                <input type="radio" name="pclassRadio" value="2">
+                <div class="class-card-body">
+                    <div class="class-card-header">
+                        <span class="class-name">2-KLASS (SECOND)</span>
+                        <span class="class-price">~£25</span>
+                    </div>
+                    <p class="class-desc">O'rta qatlam kutubxonasi va keng sayr palubasi.</p>
+                </div>
+            </label>
+
+            <label class="class-option active" data-pclass="3">
+                <input type="radio" name="pclassRadio" value="3" checked>
+                <div class="class-card-body">
+                    <div class="class-card-header">
+                        <span class="class-name">3-KLASS (STEERAGE)</span>
+                        <span class="class-price">~£9</span>
+                    </div>
+                    <p class="class-desc">Quyi umumiy paluba, tor yo'laklar va arzon chipta.</p>
+                </div>
+            </label>
+        </div>
+
+        <div class="form-group mt-3">
+            <div class="slider-row">
+                <label for="pFare">Chipta narxi (£ Fare):</label>
+                <span class="slider-val" id="pFareVal">£ 9.0</span>
+            </div>
+            <input type="range" id="pFare" min="5" max="300" step="1" value="9">
+        </div>
+
+        <div class="wizard-nav-btns">
+            <button type="button" class="btn-secondary" id="btnBackTo1">⬅ Orqaga</button>
+            <button type="button" class="btn-primary" id="btnToStep3">Davom etish ➔</button>
+        </div>
+    </div>
+
+    <!-- 3-BOSQICH: HAMROHLAR VA OILA -->
+    <div class="wizard-step" id="step3">
+        <div class="step-header">
+            <span class="step-badge">3 / 4-qadam</span>
+            <h2 class="step-title">Hamrohlar va Oila</h2>
+        </div>
+
+        <div class="form-group">
+            <label for="pSibsp">Turmush o'rtoq / Aka-singillar soni:</label>
+            <input type="number" id="pSibsp" min="0" max="8" value="0">
+            <small class="hint-text">Er/xotin, aka-uka va opa-singillar (SibSp)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="pParch">Farzandlar / Ota-ona soni:</label>
+            <input type="number" id="pParch" min="0" max="6" value="0">
+            <small class="hint-text">Bortdagi ota-ona va bolalar (Parch)</small>
+        </div>
+
+        <div class="family-status-badge" id="familyStatusBadge">
+            <span>👤 Sayohat holati:</span> <strong>Yolg'iz sayohatchi</strong>
+        </div>
+
+        <div class="wizard-nav-btns">
+            <button type="button" class="btn-secondary" id="btnBackTo2">⬅ Orqaga</button>
+            <button type="button" class="btn-primary" id="btnToStep4">Davom etish ➔</button>
+        </div>
+    </div>
+
+    <!-- 4-BOSQICH: PORT VA TASDIQLASH -->
+    <div class="wizard-step" id="step4">
+        <div class="step-header">
+            <span class="step-badge">4 / 4-qadam</span>
+            <h2 class="step-title">Chiqish Porti</h2>
+        </div>
+
+        <div class="form-group">
+            <label for="pEmbarked">Kemaga Chiqish Porti:</label>
+            <select id="pEmbarked">
+                <option value="S" selected>Southampton, Angliya</option>
+                <option value="C">Cherbourg, Fransiya</option>
+                <option value="Q">Queenstown, Irlandiya</option>
+            </select>
+        </div>
+
+        <!-- Mini Boarding Pass Rezyume -->
+        <div class="mini-pass-summary" id="miniPassSummary">
+            <div class="mini-pass-row">
+                <span>Yo'lovchi:</span> <strong id="sumName">Janob Aleksandr Smit</strong>
+            </div>
+            <div class="mini-pass-row">
+                <span>Klass / Narx:</span> <strong id="sumClass">3-klass (£9.0)</strong>
+            </div>
+            <div class="mini-pass-row">
+                <span>Hamrohlar:</span> <strong id="sumFamily">Yolg'iz (1 kishi)</strong>
+            </div>
+            <div class="mini-pass-row">
+                <span>Port:</span> <strong id="sumPort">Southampton</strong>
+            </div>
+        </div>
+
+        <button type="button" class="btn-destiny w-100" id="btnCalculateFate">
+            <span class="destiny-icon">⚓</span>
+            <span class="destiny-text">TAQDIRNI ANIQLASH (DETERMINE FATE)</span>
+            <span class="destiny-icon">⚓</span>
+        </button>
+
+        <div class="wizard-nav-btns mt-2">
+            <button type="button" class="btn-secondary w-100" id="btnBackTo3">⬅ Ma'lumotlarni o'zgartirish</button>
+        </div>
+    </div>
+
+    <!-- 5-BOSQICH: NATIJA (TAQDIR) -->
+    <div class="wizard-step" id="step5">
+        <div class="fate-result-wrapper">
+            
+            <!-- Vintage Pochta Shtampi -->
+            <div class="stamp-seal-badge" id="stampSealBadge">
+                <div class="stamp-text" id="resStampText">SURVIVED</div>
+                <div class="stamp-sub">15 APR 1912</div>
+            </div>
+
+            <div class="prob-score-block">
+                <span class="prob-caption">OMON QOLISH EHTIMOLLIGI</span>
+                <span class="prob-digits" id="resProb">78%</span>
+            </div>
+
+            <!-- Progress chizig'i -->
+            <div class="result-progress-track">
+                <div class="result-progress-fill" id="resProgressFill"></div>
+            </div>
+
+            <p class="fate-verdict-quote" id="resVerdict">
+                "Tabriklaymiz! Birinchi qutqaruv qayiqlari sizni olib ketishga ulguradi."
+            </p>
+
+            <div class="key-factors-container">
+                <span class="factors-heading">❖ TA'SIR ETGAN ASOSIY OMILLAR:</span>
+                <div class="factor-pill-item" id="resFactor1">Omil 1 yuklanmoqda...</div>
+                <div class="factor-pill-item" id="resFactor2">Omil 2 yuklanmoqda...</div>
+            </div>
+
+            <button type="button" class="btn-secondary w-100 mt-3" id="btnRestartWizard">
+                ↺ Boshqa yo'lovchi sifatida sinash
+            </button>
+        </div>
+    </div>
+
+</section>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>

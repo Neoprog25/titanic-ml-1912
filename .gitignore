@@ -1,0 +1,24 @@
+# System & Environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.vercel/
+
+# Temporary / Legacy project files
+api/
+backend/
+frontend/
+src/
+dist/
+node_modules/
+*.bat
+package*.json
+tsconfig.json
+vite.config.ts
+requirements.txt.bak
+response_dump.html
+test_out.txt
+best_titanic_model.joblib
+/index.html
