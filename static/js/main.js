@@ -626,4 +626,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Boshlang'ich sahifada (0-qadam): Keyingi qadam (1-qadam) videolarini fonda keshga yuklash
     preloadVideos(['passenger_man.mp4', 'passenger_woman.mp4']);
+
+    // -------------------------------------------------------------
+    // 10. ML AUDIT & GRIDSEARCH MODAL BOSHQARUVI
+    // -------------------------------------------------------------
+    const mlModal = document.getElementById('mlModal');
+    const openMlModalBtn = document.getElementById('openMlModalBtn');
+    const closeMlModalBtn = document.getElementById('closeMlModalBtn');
+    const closeModalBtnBottom = document.getElementById('closeModalBtnBottom');
+
+    function openModal() {
+        if (mlModal) {
+            mlModal.classList.add('active');
+            mlModal.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    function closeModal() {
+        if (mlModal) {
+            mlModal.classList.remove('active');
+            mlModal.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    if (openMlModalBtn) openMlModalBtn.addEventListener('click', openModal);
+    if (closeMlModalBtn) closeMlModalBtn.addEventListener('click', closeModal);
+    if (closeModalBtnBottom) closeModalBtnBottom.addEventListener('click', closeModal);
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mlModal && mlModal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    if (mlModal) {
+        mlModal.addEventListener('click', (e) => {
+            if (e.target === mlModal) closeModal();
+        });
+    }
 });

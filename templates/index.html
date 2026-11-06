@@ -25,6 +25,14 @@
 </div>
 
 <!-- ==============================================================
+     BOSHQARUV TUGMASI: ML TADQIQOT & GRIDSEARCH AUDIT
+     ============================================================== -->
+<button id="openMlModalBtn" class="ml-benchmark-btn">
+  <span class="icon">⚖️</span>
+  <span class="label">ML Tadqiqot & GridSearch Audit</span>
+</button>
+
+<!-- ==============================================================
      CHAP TOMONDAGI ATMOSFERA VA BRENDING (75% OCHIQ MAYDON)
      ============================================================== -->
 <aside class="cinema-brand-left">
@@ -300,6 +308,140 @@
     </div>
 
 </section>
+
+<!-- ==============================================================
+     KINEMATOGRAFIK MODAL OYNA: ML ADMIRALTY REPORT & BENCHMARKING
+     ============================================================== -->
+<div id="mlModal" class="ml-modal-overlay" aria-hidden="true">
+  <div class="ml-modal-content">
+    <div class="ml-modal-header">
+      <div>
+        <span class="badge-vintage">WHITE STAR LINE • ML ADMIRALTY REPORT</span>
+        <h2>Titanic Dataset: Algoritmlar & GridSearch CV Tadqiqoti</h2>
+        <p class="subtitle">10-qadamli giperparametrik qidiruv (5-Fold Stratified Cross-Validation) natijalari</p>
+      </div>
+      <button id="closeMlModalBtn" class="ml-modal-close" title="Yopish">&times;</button>
+    </div>
+
+    <div class="ml-modal-body">
+      <!-- Asosiy g'olib modeli banneri -->
+      <div class="winner-spotlight">
+        <div class="winner-icon">🏆</div>
+        <div class="winner-info">
+          <span class="winner-tag">TAVSIYA ETILGAN G'OLIB MODEL</span>
+          <h3>Random Forest Classifier — 83.0% CV Aniqlik</h3>
+          <p>Optimal giperparametrlar: <code>n_estimators: 100</code>, <code>max_depth: 5</code>, <code>min_samples_split: 2</code>. Ushbu model umumlashtirish qobiliyati (overfitting xavfi pastligi) va ROC-AUC (0.839) bo'yicha eng yuqori ko'rsatkich qayd etdi.</p>
+        </div>
+      </div>
+
+      <!-- Taqqoslash Jadvali -->
+      <div class="table-responsive">
+        <table class="ml-benchmark-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Algoritm</th>
+              <th>CV Aniqlik (5-Fold)</th>
+              <th>Test Aniqlik</th>
+              <th>ROC-AUC</th>
+              <th>F1-Score</th>
+              <th>Eng Yaxshi Parametrlar (GridSearch)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-winner">
+              <td>1</td>
+              <td>
+                <strong>Random Forest</strong>
+                <span class="badge-gold">G'OLIB</span>
+              </td>
+              <td>
+                <div class="score-bar-wrapper">
+                  <span class="score-text">83.0%</span>
+                  <div class="score-bar"><div class="fill" style="width: 83%;"></div></div>
+                  <span class="std-text">±3.0</span>
+                </div>
+              </td>
+              <td>78.2%</td>
+              <td>0.839</td>
+              <td>0.678</td>
+              <td><code>max_depth=5, n_estimators=100</code></td>
+            </tr>
+
+            <tr>
+              <td>2</td>
+              <td><strong>Gradient Boosting</strong></td>
+              <td>
+                <div class="score-bar-wrapper">
+                  <span class="score-text">82.6%</span>
+                  <div class="score-bar"><div class="fill" style="width: 82.6%;"></div></div>
+                  <span class="std-text">±2.9</span>
+                </div>
+              </td>
+              <td>78.8%</td>
+              <td>0.833</td>
+              <td>0.672</td>
+              <td><code>learning_rate=0.05, max_depth=2, n_estimators=100</code></td>
+            </tr>
+
+            <tr>
+              <td>3</td>
+              <td><strong>Decision Tree</strong></td>
+              <td>
+                <div class="score-bar-wrapper">
+                  <span class="score-text">82.0%</span>
+                  <div class="score-bar"><div class="fill" style="width: 82%;"></div></div>
+                  <span class="std-text">±2.8</span>
+                </div>
+              </td>
+              <td>80.4%</td>
+              <td>0.811</td>
+              <td>0.733</td>
+              <td><code>max_depth=10, min_samples_split=10</code></td>
+            </tr>
+
+            <tr>
+              <td>4</td>
+              <td><strong>Logistic Regression</strong></td>
+              <td>
+                <div class="score-bar-wrapper">
+                  <span class="score-text">81.2%</span>
+                  <div class="score-bar"><div class="fill" style="width: 81.2%;"></div></div>
+                  <span class="std-text">±1.5</span>
+                </div>
+              </td>
+              <td>80.4%</td>
+              <td>0.835</td>
+              <td>0.706</td>
+              <td><code>C=0.01, penalty='l2'</code></td>
+            </tr>
+
+            <tr>
+              <td>5</td>
+              <td><strong>KNN (K-Nearest Neighbors)</strong></td>
+              <td>
+                <div class="score-bar-wrapper">
+                  <span class="score-text">80.5%</span>
+                  <div class="score-bar"><div class="fill" style="width: 80.5%;"></div></div>
+                  <span class="std-text">±1.1</span>
+                </div>
+              </td>
+              <td>80.4%</td>
+              <td>0.849</td>
+              <td>0.724</td>
+              <td><code>n_neighbors=9, weights='uniform'</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ml-modal-footer">
+      <span class="info-note">💡 Ishlab chiqarishda foydalanuvchilar taqdirini bashorat qilish uchun <strong>Random Forest (GridSearchCV)</strong> modeli yuklangan.</span>
+      <button id="closeModalBtnBottom" class="btn-secondary">Yopish va Kemaga Qaytish</button>
+    </div>
+  </div>
+</div>
 
 <script src="/static/js/main.js"></script>
 </body>

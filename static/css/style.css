@@ -722,3 +722,274 @@ input[type="range"] {
         max-height: 65vh;
     }
 }
+
+/* ==========================================================================
+   8. ML ADMIRALTY REPORT & BENCHMARK MODAL
+   ========================================================================== */
+
+/* Tugma: Yuqori chapda nafis suzib turuvchi */
+.ml-benchmark-btn {
+  position: fixed;
+  top: 24px;
+  left: 28px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(11, 19, 32, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 9999px;
+  color: #f1ebd8;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.ml-benchmark-btn:hover {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(212, 175, 55, 0.35);
+  color: #ffffff;
+}
+
+/* Modal Overlay */
+.ml-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 9, 15, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.ml-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Modal Card */
+.ml-modal-content {
+  background: rgba(14, 23, 38, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(212, 175, 55, 0.15);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 950px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #e2e8f0;
+  transform: scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ml-modal-overlay.active .ml-modal-content {
+  transform: scale(1);
+}
+
+.ml-modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: rgba(11, 19, 32, 0.6);
+}
+
+.badge-vintage {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: #d4af37;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.ml-modal-header h2 {
+  font-family: 'Cinzel', serif, Georgia;
+  color: #f7fafc;
+  font-size: 1.4rem;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.ml-modal-header .subtitle {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.ml-modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ml-modal-close:hover {
+  color: #d4af37;
+}
+
+.ml-modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+/* Winner Spotlight */
+.winner-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.winner-icon {
+  font-size: 2.2rem;
+}
+
+.winner-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #d4af37;
+  letter-spacing: 0.1em;
+}
+
+.winner-info h3 {
+  margin: 2px 0 6px 0;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.winner-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+/* Table */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.ml-benchmark-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.ml-benchmark-table th {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ml-benchmark-table td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.row-winner {
+  background: rgba(212, 175, 55, 0.07);
+}
+
+.badge-gold {
+  background: #d4af37;
+  color: #0b1320;
+  font-weight: 700;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.score-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-bar {
+  flex-grow: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.score-bar .fill {
+  height: 100%;
+  background: #d4af37;
+  border-radius: 3px;
+}
+
+.std-text {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.ml-modal-content code {
+  font-family: 'Consolas', monospace;
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #cbd5e1;
+}
+
+.ml-modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(11, 19, 32, 0.6);
+  gap: 16px;
+}
+
+.info-note {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .ml-benchmark-btn {
+    top: 15px;
+    left: 15px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+  .cinema-brand-left {
+    top: 70px;
+  }
+}
