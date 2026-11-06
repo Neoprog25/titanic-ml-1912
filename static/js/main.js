@@ -637,7 +637,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openModal() {
         if (mlModal) {
-            mlModal.classList.add('active');
+            mlModal.style.display = 'flex';
+            setTimeout(() => mlModal.classList.add('active'), 10);
             mlModal.setAttribute('aria-hidden', 'false');
         }
     }
@@ -645,6 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         if (mlModal) {
             mlModal.classList.remove('active');
+            mlModal.style.display = 'none';
             mlModal.setAttribute('aria-hidden', 'true');
         }
     }

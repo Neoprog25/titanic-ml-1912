@@ -762,13 +762,13 @@ input[type="range"] {
 
 /* Modal Overlay */
 .ml-modal-overlay {
+  display: none !important;
   position: fixed;
   inset: 0;
   background: rgba(5, 9, 15, 0.82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  z-index: 1000;
-  display: flex;
+  z-index: 9999;
   align-items: center;
   justify-content: center;
   padding: 24px;
@@ -778,6 +778,10 @@ input[type="range"] {
 }
 
 .ml-modal-overlay.active {
+  display: flex !important;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   opacity: 1;
   pointer-events: auto;
 }
