@@ -28,7 +28,7 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background: transparent !important;
+    background-color: #080e18 !important;
     overflow-x: hidden;
     color: var(--ink-cream);
     font-family: 'Old Standard TT', Georgia, serif;
@@ -46,6 +46,7 @@ html, body {
     height: 100vh;
     z-index: -2;
     overflow: hidden;
+    background-color: #080e18;
 }
 
 .bg-video {

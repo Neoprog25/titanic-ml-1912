@@ -1,27 +1,24 @@
 /**
  * R.M.S. TITANIC — 1912 CINEMATIC MULTI-STEP WIZARD
  * Lead UI/UX Architect Edition:
+ * - "Zero-Black-Screen" Crossfade Engine (playing-event based, non-destructive)
+ * - Progressive Step-by-Step Video Preloading (link prefetch)
  * - Full Two-Way Reactive Binding (Travel Class <-> Ticket Fare Slider)
  * - Strict Reactive Passenger & Family Logic
- * - Flicker-Free Dual Video Cross-Fade Engine
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------
     // 1. DOM ELEMENTLAR VA HOLAT O'ZGARUVCHILARI
     // -------------------------------------------------------------
-    let vA = document.getElementById('videoA');
-    let vB = document.getElementById('videoB');
+    let currentVideo = document.getElementById('videoA');
+    let nextVideo = document.getElementById('videoB');
     const sceneLabel = document.getElementById('sceneLabel');
 
-    if (vA) {
-        vA.muted = true;
-        vA.play().catch(err => console.warn("Autoplay kutmoqda:", err));
+    if (currentVideo) {
+        currentVideo.muted = true;
+        currentVideo.play().catch(err => console.warn("Autoplay kutmoqda:", err));
     }
-
-    let currentActiveEl = vA;
-    let currentNextEl = vB;
-    let lastLoadedVideoPath = '/static/videos/intro.mp4';
 
     let currentStep = 0;
     const totalSteps = 5;
@@ -54,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSyncing = false;
 
     // -------------------------------------------------------------
-    // 2. VIDEO SAHNALAR TAVSIFI VA KROSS-FEYD ENGINE
+    // 2. VIDEO SAHNALAR TAVSIFI VA ZERO-BLACK-SCREEN CROSSFADE
     // -------------------------------------------------------------
     const sceneDescriptions = {
         'intro.mp4': "Sautgempton porti (R.M.S. Titanic)",
@@ -77,77 +74,95 @@ document.addEventListener('DOMContentLoaded', () => {
         'fate.mp4': "Muzdek Shimoliy Atlantika okeani (15-aprel, 1912)"
     };
 
-    function crossFadeToVideo(videoPathOrName) {
-        if (!currentNextEl || !currentActiveEl) return;
+    /**
+     * "Zero-Black-Screen" Crossfade:
+     * Yangi video kadr berishni boshlaguncha ('playing' hodisasi) eski video to'xtamaydi.
+     */
+    function smoothPlayVideo(newSrc) {
+        if (!currentVideo || !nextVideo) return;
 
-        let targetPath = videoPathOrName;
+        let targetPath = newSrc;
         if (!targetPath.startsWith('/static/videos/')) {
-            targetPath = `/static/videos/${videoPathOrName}`;
+            targetPath = `/static/videos/${newSrc}`;
         }
         if (!targetPath.endsWith('.mp4')) {
             targetPath += '.mp4';
         }
 
-        if (lastLoadedVideoPath === targetPath) return;
-        lastLoadedVideoPath = targetPath;
-
-        const filename = targetPath.split('/').pop();
-
-        if (sceneLabel && sceneDescriptions[filename]) {
-            sceneLabel.style.opacity = '0';
-            setTimeout(() => {
-                sceneLabel.textContent = sceneDescriptions[filename];
-                sceneLabel.style.opacity = '1';
-            }, 200);
+        // Agar ayni paytda o'ynayotgan video bilan bir xil bo'lsa, qayta yuklamaymiz
+        if (currentVideo.getAttribute('src') === targetPath || (currentVideo.currentSrc && currentVideo.currentSrc.endsWith(targetPath))) {
+            return;
         }
 
-        currentNextEl.src = targetPath;
-        currentNextEl.muted = true;
-        currentNextEl.load();
+        // 1. Yangi manbani orqada turgan (nextVideo) tegga yuklaymiz
+        nextVideo.src = targetPath;
+        nextVideo.muted = true;
+        nextVideo.load();
 
-        let hasSwapped = false;
+        // 2. Yangi video amalda o'ynab ketmaguncha ESKI VIDEONI ASLO O'CHIRMAYMIZ!
+        const onPlaying = () => {
+            // Sahna tavsif matnini silliq yangilash
+            const filename = targetPath.split('/').pop();
+            if (sceneLabel && sceneDescriptions[filename]) {
+                sceneLabel.style.opacity = '0';
+                setTimeout(() => {
+                    sceneLabel.textContent = sceneDescriptions[filename];
+                    sceneLabel.style.opacity = '1';
+                }, 200);
+            }
 
-        const performSwap = () => {
-            if (hasSwapped) return;
-            hasSwapped = true;
+            // Faqatgina yangi video kadr berishni boshlaganda crossfade qilamiz
+            nextVideo.classList.add('active-video');
+            nextVideo.classList.remove('next-video');
 
-            currentNextEl.removeEventListener('canplay', performSwap);
-            currentNextEl.removeEventListener('loadeddata', performSwap);
+            currentVideo.classList.remove('active-video');
+            currentVideo.classList.add('next-video');
 
-            currentNextEl.play().then(() => {
-                currentNextEl.classList.remove('next-video');
-                currentNextEl.classList.add('active-video');
+            // 0.8 soniyadan keyin eski videoni to'xtatamiz va o'rinlarni almashtiramiz
+            setTimeout(() => {
+                currentVideo.pause();
+                const temp = currentVideo;
+                currentVideo = nextVideo;
+                nextVideo = temp;
+            }, 800);
 
-                currentActiveEl.classList.remove('active-video');
-                currentActiveEl.classList.add('next-video');
-
-                const temp = currentActiveEl;
-                currentActiveEl = currentNextEl;
-                currentNextEl = temp;
-            }).catch(err => {
-                console.warn("Autoplay policy handled:", err);
-                currentNextEl.classList.remove('next-video');
-                currentNextEl.classList.add('active-video');
-
-                currentActiveEl.classList.remove('active-video');
-                currentActiveEl.classList.add('next-video');
-
-                const temp = currentActiveEl;
-                currentActiveEl = currentNextEl;
-                currentNextEl = temp;
-            });
+            nextVideo.removeEventListener('playing', onPlaying);
         };
 
-        currentNextEl.addEventListener('canplay', performSwap);
-        currentNextEl.addEventListener('loadeddata', performSwap);
+        nextVideo.addEventListener('playing', onPlaying);
+        nextVideo.play().catch(e => console.warn("Video play buffering:", e));
+    }
 
-        setTimeout(() => {
-            if (!hasSwapped) performSwap();
-        }, 800);
+    // crossFadeToVideo funksiyasi uchun xavfsiz alias
+    const crossFadeToVideo = smoothPlayVideo;
+
+    // -------------------------------------------------------------
+    // 3. AQLLI BOSQICHMA-BOSQICH KESH (PROGRESSIVE PRELOADING)
+    // -------------------------------------------------------------
+    const preloadedUrls = new Set();
+    function preloadVideos(videoUrlList) {
+        if (!videoUrlList || !Array.isArray(videoUrlList)) return;
+        videoUrlList.forEach(url => {
+            let fullUrl = url;
+            if (!fullUrl.startsWith('/static/videos/')) {
+                fullUrl = `/static/videos/${url}`;
+            }
+            if (!fullUrl.endsWith('.mp4')) {
+                fullUrl += '.mp4';
+            }
+            if (preloadedUrls.has(fullUrl)) return;
+            preloadedUrls.add(fullUrl);
+
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.as = 'video';
+            link.href = fullUrl;
+            document.head.appendChild(link);
+        });
     }
 
     // -------------------------------------------------------------
-    // 3. YO'LOVCHI VA OILA VIDEO MANTIQI (1 va 3-BOSQICHLAR)
+    // 4. YO'LOVCHI VA OILA VIDEO MANTIQI (1 va 3-BOSQICHLAR)
     // -------------------------------------------------------------
     function getPassengerBaseVideo(gender, age) {
         const isMale = (gender === 'male' || gender === 'Erkak' || gender.toLowerCase().includes('erkak'));
@@ -193,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 4. KLASS VA CHIPTA NARXI: IKKI TOMONLAMA SINXRONIZATSIYA (TWO-WAY BINDING)
+    // 5. KLASS VA CHIPTA NARXI: IKKI TOMONLAMA SINXRONIZATSIYA (TWO-WAY BINDING)
     // -------------------------------------------------------------
     const classConfigs = {
         1: {
@@ -262,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Agar 2-bosqichda bo'lsa, mos klass videosiga silliq o'tish
         if (triggerVideo && currentStep === 2) {
-            crossFadeToVideo(classConfigs[targetClass].video);
+            smoothPlayVideo(classConfigs[targetClass].video);
         }
     }
 
@@ -308,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 5. WIZARD QADAMLARI BOSHQARUVI
+    // 6. WIZARD QADAMLARI VA BOSQICHMA-BOSQICH PRELOAD
     // -------------------------------------------------------------
     function updateVideoForCurrentStep() {
         const age = parseInt(pAge.value) || 28;
@@ -318,23 +333,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (currentStep) {
             case 0:
-                crossFadeToVideo('/static/videos/intro.mp4');
+                smoothPlayVideo('/static/videos/intro.mp4');
                 break;
             case 1:
-                crossFadeToVideo(getPassengerBaseVideo(gender, age));
+                smoothPlayVideo(getPassengerBaseVideo(gender, age));
                 break;
             case 2:
-                crossFadeToVideo(getClassVideo());
+                smoothPlayVideo(getClassVideo());
                 break;
             case 3:
-                crossFadeToVideo(getFamilyStepVideo(gender, age, sibsp, parch));
+                smoothPlayVideo(getFamilyStepVideo(gender, age, sibsp, parch));
                 break;
             case 4:
-                crossFadeToVideo('/static/videos/boarding.mp4');
+                smoothPlayVideo('/static/videos/boarding.mp4');
                 updateSummaryDetails();
                 break;
             case 5:
-                crossFadeToVideo('/static/videos/fate.mp4');
+                smoothPlayVideo('/static/videos/fate.mp4');
                 break;
         }
     }
@@ -362,17 +377,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentStep = stepIndex;
         updateVideoForCurrentStep();
+
+        // Progressive Step-by-Step Preloading
+        switch (stepIndex) {
+            case 0:
+                // 0-qadamda: 1-qadam yo'lovchi videolari
+                preloadVideos(['passenger_man.mp4', 'passenger_woman.mp4']);
+                break;
+            case 1:
+                // 1-qadamda: 2-qadam klass videolari
+                preloadVideos(['class1.mp4', 'class2.mp4', 'class3.mp4']);
+                break;
+            case 2:
+                // 2-qadamda: 3-qadam oila/hamroh videolari
+                preloadVideos(['alone.mp4', 'couple.mp4', 'family.mp4']);
+                break;
+            case 3:
+                // 3-qadamda: 4-qadam va natija videolari
+                preloadVideos(['boarding.mp4', 'fate.mp4']);
+                break;
+        }
     }
 
     // -------------------------------------------------------------
-    // 6. HODISALAR (EVENT LISTENERS)
+    // 7. HODISALAR (EVENT LISTENERS)
     // -------------------------------------------------------------
     // 1-bosqich: Yosh va Jins o'zgarishi
     function handlePassengerIdentityChange() {
         const age = parseInt(pAge.value) || 28;
         pAgeVal.textContent = `${age} yosh`;
         if (currentStep === 1) {
-            crossFadeToVideo(getPassengerBaseVideo(pSex.value, age));
+            smoothPlayVideo(getPassengerBaseVideo(pSex.value, age));
         }
     }
 
@@ -417,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentStep === 3) {
-            crossFadeToVideo(getFamilyStepVideo(gender, age, sibsp, parch));
+            smoothPlayVideo(getFamilyStepVideo(gender, age, sibsp, parch));
         }
     }
 
@@ -451,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------------------------------------------------------------
-    // 7. NAVIGATION BUTTONS
+    // 8. NAVIGATION BUTTONS
     // -------------------------------------------------------------
     document.getElementById('btnStartWizard').addEventListener('click', () => goToStep(1));
     document.getElementById('btnBackTo0').addEventListener('click', () => goToStep(0));
@@ -469,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -------------------------------------------------------------
-    // 8. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
+    // 9. TAQDIRNI ANIQLASH (DETERMINE FATE) VA ML API
     // -------------------------------------------------------------
     const btnCalculateFate = document.getElementById('btnCalculateFate');
     const stampSealBadge = document.getElementById('stampSealBadge');
@@ -566,4 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Boshlang'ich holatni to'g'ri o'rnatish
     updateClassUI(3, false);
+
+    // Boshlang'ich sahifada (0-qadam): Keyingi qadam (1-qadam) videolarini fonda keshga yuklash
+    preloadVideos(['passenger_man.mp4', 'passenger_woman.mp4']);
 });
