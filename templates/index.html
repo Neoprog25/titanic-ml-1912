@@ -8,29 +8,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=1.1">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
 <!-- ==============================================================
-     SEAMLESS CROSS-FADE KINEMATIK VIDEO FON (IKKI QAVATLI + POSTER FALLBACK)
+     SEAMLESS CROSS-FADE KINEMATIK VIDEO FON (IKKI QAVATLI)
      ============================================================== -->
 <div class="video-container">
-  <div id="videoPoster" class="bg-poster" style="background-image: url('{{ url_for('static', filename='images/posters/intro.webp') }}');"></div>
   <video id="videoA" class="bg-video active-video" autoplay muted loop playsinline preload="auto">
     <source src="{{ url_for('static', filename='videos/intro.mp4') }}" type="video/mp4">
   </video>
-  <video id="videoB" class="bg-video next-video" muted loop playsinline preload="metadata"></video>
+  <video id="videoB" class="bg-video next-video" muted loop playsinline preload="auto"></video>
   <div class="cinematic-overlay"></div>
 </div>
-
-<!-- ==============================================================
-     BOSHQARUV TUGMASI: ML TADQIQOT & GRIDSEARCH AUDIT
-     ============================================================== -->
-<button id="openMlModalBtn" class="ml-benchmark-btn">
-  <span class="icon">⚖️</span>
-  <span class="label">ML Tadqiqot & GridSearch Audit</span>
-</button>
 
 <!-- ==============================================================
      CHAP TOMONDAGI ATMOSFERA VA BRENDING (75% OCHIQ MAYDON)
@@ -271,177 +262,166 @@
         </div>
     </div>
 
-    <!-- 5-BOSQICH: NATIJA (TAQDIR) -->
+    <!-- 5-BOSQICH: NATIJA (TAQDIR VA ML BENCHMARK) -->
     <div class="wizard-step" id="step5">
-        <div class="fate-result-wrapper">
+        <div class="result-card-container">
             
-            <!-- Vintage Pochta Shtampi -->
-            <div class="stamp-seal-badge" id="stampSealBadge">
-                <div class="stamp-text" id="resStampText">SURVIVED</div>
-                <div class="stamp-sub">15 APR 1912</div>
+            <!-- White Star Line uslubidagi 2 ta Nafis Tab Switcher -->
+            <div class="result-tab-nav" role="tablist">
+                <button type="button" class="result-tab-btn active" id="tabBtnFate" data-tab="0" role="tab" aria-selected="true">
+                    <span class="tab-icon">📜</span>
+                    <span class="tab-label">Yo'lovchi Taqdiri</span>
+                </button>
+                <button type="button" class="result-tab-btn" id="tabBtnBenchmark" data-tab="1" role="tab" aria-selected="false">
+                    <span class="tab-icon">⚙️</span>
+                    <span class="tab-label">ML & GridSearch</span>
+                </button>
+                <div class="tab-active-indicator" id="tabIndicator"></div>
             </div>
 
-            <div class="prob-score-block">
-                <span class="prob-caption">OMON QOLISH EHTIMOLLIGI</span>
-                <span class="prob-digits" id="resProb">78%</span>
+            <!-- 2 Varaqali Gorizontal Carousel / Swipe Viewport -->
+            <div class="result-carousel-viewport" id="resultCarouselViewport">
+                <div class="result-carousel-track" id="resultCarouselTrack">
+                    
+                    <!-- 1-VARAQA: YO'LOVCHI TAQDIRI -->
+                    <div class="result-sheet" id="sheetFate" role="tabpanel">
+                        <div class="fate-result-wrapper">
+                            
+                            <!-- Vintage Pochta Shtampi -->
+                            <div class="stamp-seal-badge" id="stampSealBadge">
+                                <div class="stamp-text" id="resStampText">SURVIVED</div>
+                                <div class="stamp-sub">15 APR 1912</div>
+                            </div>
+
+                            <div class="prob-score-block">
+                                <span class="prob-caption">OMON QOLISH EHTIMOLLIGI</span>
+                                <span class="prob-digits" id="resProb">78%</span>
+                            </div>
+
+                            <!-- Progress chizig'i -->
+                            <div class="result-progress-track">
+                                <div class="result-progress-fill" id="resProgressFill"></div>
+                            </div>
+
+                            <p class="fate-verdict-quote" id="resVerdict">
+                                "Tabriklaymiz! Birinchi qutqaruv qayiqlari sizni olib ketishga ulguradi."
+                            </p>
+
+                            <div class="key-factors-container">
+                                <span class="factors-heading">❖ TA'SIR ETGAN ASOSIY OMILLAR:</span>
+                                <div class="factor-pill-item" id="resFactor1">Omil 1 yuklanmoqda...</div>
+                                <div class="factor-pill-item" id="resFactor2">Omil 2 yuklanmoqda...</div>
+                            </div>
+
+                            <button type="button" class="btn-secondary w-100 mt-3 btnRestartWizard" id="btnRestartWizard">
+                                ↺ Boshqa yo'lovchi sifatida sinash
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2-VARAQA: ML & GRIDSEARCH BENCHMARK TAHLILI -->
+                    <div class="result-sheet" id="sheetBenchmark" role="tabpanel">
+                        <div class="ml-benchmark-wrapper">
+                            <div class="benchmark-header">
+                                <span class="benchmark-badge">R.M.S. TITANIC ML ENGINE</span>
+                                <h3 class="benchmark-title">Model Tanlash & GridSearch CV (5-Fold)</h3>
+                            </div>
+
+                            <!-- G'olib model kartasi -->
+                            <div class="winner-model-card">
+                                <div class="winner-crown-row">
+                                    <span class="winner-crown">👑 G'OLIB MODEL</span>
+                                    <span class="winner-metric">ROC-AUC: 0.839</span>
+                                </div>
+                                <div class="winner-name-row">
+                                    <span class="winner-name">Random Forest</span>
+                                    <span class="winner-score">83.0%</span>
+                                </div>
+                                <div class="winner-params-box">
+                                    <span class="param-tag">cv=5 Stratified</span>
+                                    <span class="param-tag">n_estimators=100</span>
+                                    <span class="param-tag">max_depth=5</span>
+                                    <span class="param-tag">min_samples_split=2</span>
+                                </div>
+                            </div>
+
+                            <!-- Modellarning taqqoslash diagrammasi -->
+                            <div class="models-comparison-chart">
+                                <span class="chart-caption">❖ MODELLARNING ANQLIK TAQQOSI (CROSS-VALIDATION):</span>
+                                
+                                <!-- 1. Random Forest -->
+                                <div class="model-bar-item winner">
+                                    <div class="model-bar-header">
+                                        <span class="model-name">1. Random Forest</span>
+                                        <span class="model-acc">83.0% (±3.0)</span>
+                                    </div>
+                                    <div class="model-bar-track">
+                                        <div class="model-bar-fill gold-bar" data-width="83.0%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Gradient Boosting -->
+                                <div class="model-bar-item">
+                                    <div class="model-bar-header">
+                                        <span class="model-name">2. Gradient Boosting</span>
+                                        <span class="model-acc">82.6% (±2.9)</span>
+                                    </div>
+                                    <div class="model-bar-track">
+                                        <div class="model-bar-fill silver-bar" data-width="82.6%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Decision Tree -->
+                                <div class="model-bar-item">
+                                    <div class="model-bar-header">
+                                        <span class="model-name">3. Decision Tree</span>
+                                        <span class="model-acc">82.0% (±2.8)</span>
+                                    </div>
+                                    <div class="model-bar-track">
+                                        <div class="model-bar-fill silver-bar" data-width="82.0%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Logistic Regression -->
+                                <div class="model-bar-item">
+                                    <div class="model-bar-header">
+                                        <span class="model-name">4. Logistic Regression</span>
+                                        <span class="model-acc">81.2% (±1.5)</span>
+                                    </div>
+                                    <div class="model-bar-track">
+                                        <div class="model-bar-fill silver-bar" data-width="81.2%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 5. K-Nearest Neighbors -->
+                                <div class="model-bar-item">
+                                    <div class="model-bar-header">
+                                        <span class="model-name">5. KNN</span>
+                                        <span class="model-acc">80.5% (±1.1)</span>
+                                    </div>
+                                    <div class="model-bar-track">
+                                        <div class="model-bar-fill silver-bar" data-width="80.5%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="benchmark-summary-quote">
+                                "Ishlab chiqarishda eng yuqori barqarorlik va ROC-AUC ko'rsatgan Random Forest modeli qo'llanilmoqda."
+                            </p>
+
+                            <button type="button" class="btn-secondary w-100 mt-2 btnRestartWizard">
+                                ↺ Qayta sinash
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Progress chizig'i -->
-            <div class="result-progress-track">
-                <div class="result-progress-fill" id="resProgressFill"></div>
-            </div>
-
-            <p class="fate-verdict-quote" id="resVerdict">
-                "Tabriklaymiz! Birinchi qutqaruv qayiqlari sizni olib ketishga ulguradi."
-            </p>
-
-            <div class="key-factors-container">
-                <span class="factors-heading">❖ TA'SIR ETGAN ASOSIY OMILLAR:</span>
-                <div class="factor-pill-item" id="resFactor1">Omil 1 yuklanmoqda...</div>
-                <div class="factor-pill-item" id="resFactor2">Omil 2 yuklanmoqda...</div>
-            </div>
-
-            <button type="button" class="btn-secondary w-100 mt-3" id="btnRestartWizard">
-                ↺ Boshqa yo'lovchi sifatida sinash
-            </button>
         </div>
     </div>
 
 </section>
-
-<!-- ==============================================================
-     KINEMATOGRAFIK MODAL OYNA: ML ADMIRALTY REPORT & BENCHMARKING
-     ============================================================== -->
-<div id="mlModal" class="ml-modal-overlay" aria-hidden="true" style="display: none;">
-  <div class="ml-modal-content">
-    <div class="ml-modal-header">
-      <div>
-        <span class="badge-vintage">WHITE STAR LINE • ML ADMIRALTY REPORT</span>
-        <h2>Titanic Dataset: Algoritmlar & GridSearch CV Tadqiqoti</h2>
-        <p class="subtitle">10-qadamli giperparametrik qidiruv (5-Fold Stratified Cross-Validation) natijalari</p>
-      </div>
-      <button id="closeMlModalBtn" class="ml-modal-close" title="Yopish">&times;</button>
-    </div>
-
-    <div class="ml-modal-body">
-      <!-- Asosiy g'olib modeli banneri -->
-      <div class="winner-spotlight">
-        <div class="winner-icon">🏆</div>
-        <div class="winner-info">
-          <span class="winner-tag">TAVSIYA ETILGAN G'OLIB MODEL</span>
-          <h3>Random Forest Classifier — 83.0% CV Aniqlik</h3>
-          <p>Optimal giperparametrlar: <code>n_estimators: 100</code>, <code>max_depth: 5</code>, <code>min_samples_split: 2</code>. Ushbu model umumlashtirish qobiliyati (overfitting xavfi pastligi) va ROC-AUC (0.839) bo'yicha eng yuqori ko'rsatkich qayd etdi.</p>
-        </div>
-      </div>
-
-      <!-- Taqqoslash Jadvali -->
-      <div class="table-responsive">
-        <table class="ml-benchmark-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Algoritm</th>
-              <th>CV Aniqlik (5-Fold)</th>
-              <th>Test Aniqlik</th>
-              <th>ROC-AUC</th>
-              <th>F1-Score</th>
-              <th>Eng Yaxshi Parametrlar (GridSearch)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="row-winner">
-              <td>1</td>
-              <td>
-                <strong>Random Forest</strong>
-                <span class="badge-gold">G'OLIB</span>
-              </td>
-              <td>
-                <div class="score-bar-wrapper">
-                  <span class="score-text">83.0%</span>
-                  <div class="score-bar"><div class="fill" style="width: 83%;"></div></div>
-                  <span class="std-text">±3.0</span>
-                </div>
-              </td>
-              <td>78.2%</td>
-              <td>0.839</td>
-              <td>0.678</td>
-              <td><code>max_depth=5, n_estimators=100</code></td>
-            </tr>
-
-            <tr>
-              <td>2</td>
-              <td><strong>Gradient Boosting</strong></td>
-              <td>
-                <div class="score-bar-wrapper">
-                  <span class="score-text">82.6%</span>
-                  <div class="score-bar"><div class="fill" style="width: 82.6%;"></div></div>
-                  <span class="std-text">±2.9</span>
-                </div>
-              </td>
-              <td>78.8%</td>
-              <td>0.833</td>
-              <td>0.672</td>
-              <td><code>learning_rate=0.05, max_depth=2, n_estimators=100</code></td>
-            </tr>
-
-            <tr>
-              <td>3</td>
-              <td><strong>Decision Tree</strong></td>
-              <td>
-                <div class="score-bar-wrapper">
-                  <span class="score-text">82.0%</span>
-                  <div class="score-bar"><div class="fill" style="width: 82%;"></div></div>
-                  <span class="std-text">±2.8</span>
-                </div>
-              </td>
-              <td>80.4%</td>
-              <td>0.811</td>
-              <td>0.733</td>
-              <td><code>max_depth=10, min_samples_split=10</code></td>
-            </tr>
-
-            <tr>
-              <td>4</td>
-              <td><strong>Logistic Regression</strong></td>
-              <td>
-                <div class="score-bar-wrapper">
-                  <span class="score-text">81.2%</span>
-                  <div class="score-bar"><div class="fill" style="width: 81.2%;"></div></div>
-                  <span class="std-text">±1.5</span>
-                </div>
-              </td>
-              <td>80.4%</td>
-              <td>0.835</td>
-              <td>0.706</td>
-              <td><code>C=0.01, penalty='l2'</code></td>
-            </tr>
-
-            <tr>
-              <td>5</td>
-              <td><strong>KNN (K-Nearest Neighbors)</strong></td>
-              <td>
-                <div class="score-bar-wrapper">
-                  <span class="score-text">80.5%</span>
-                  <div class="score-bar"><div class="fill" style="width: 80.5%;"></div></div>
-                  <span class="std-text">±1.1</span>
-                </div>
-              </td>
-              <td>80.4%</td>
-              <td>0.849</td>
-              <td>0.724</td>
-              <td><code>n_neighbors=9, weights='uniform'</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="ml-modal-footer">
-      <span class="info-note">💡 Ishlab chiqarishda foydalanuvchilar taqdirini bashorat qilish uchun <strong>Random Forest (GridSearchCV)</strong> modeli yuklangan.</span>
-      <button id="closeModalBtnBottom" class="btn-secondary">Yopish va Kemaga Qaytish</button>
-    </div>
-  </div>
-</div>
 
 <script src="/static/js/main.js"></script>
 </body>
