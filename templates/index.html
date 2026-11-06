@@ -13,9 +13,10 @@
 <body>
 
 <!-- ==============================================================
-     SEAMLESS CROSS-FADE KINEMATIK VIDEO FON (IKKI QAVATLI)
+     SEAMLESS CROSS-FADE KINEMATIK VIDEO FON (IKKI QAVATLI + POSTER FALLBACK)
      ============================================================== -->
 <div class="video-container">
+  <div id="videoPoster" class="bg-poster" style="background-image: url('{{ url_for('static', filename='images/posters/intro.webp') }}');"></div>
   <video id="videoA" class="bg-video active-video" autoplay muted loop playsinline preload="auto">
     <source src="{{ url_for('static', filename='videos/intro.mp4') }}" type="video/mp4">
   </video>

@@ -36,7 +36,7 @@ html, body {
 }
 
 /* ==========================================================================
-   1. IKKI QAVATLI KINEMATOGRAFIK VIDEO STAGE (CROSS-FADE)
+   1. IKKI QAVATLI KINEMATOGRAFIK VIDEO STAGE (CROSS-FADE + POSTER FALLBACK)
    ========================================================================== */
 .video-container {
     position: fixed;
@@ -47,6 +47,16 @@ html, body {
     z-index: -2;
     overflow: hidden;
     background-color: #080e18;
+}
+
+.bg-poster {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transition: background-image 0.4s ease;
+    filter: brightness(0.95);
 }
 
 .bg-video {

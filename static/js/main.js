@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------
     let currentVideo = document.getElementById('videoA');
     let nextVideo = document.getElementById('videoB');
+    const videoPoster = document.getElementById('videoPoster');
     const sceneLabel = document.getElementById('sceneLabel');
 
     if (currentVideo) {
@@ -75,8 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * "Zero-Black-Screen" Crossfade:
-     * Yangi video kadr berishni boshlaguncha ('playing' hodisasi) eski video to'xtamaydi.
+     * Sahnaning poster rasmini bir lahzada (0.05s) o'rnatish:
+     * Video yuklanguncha qora ekran chiqishini 100% yo'qotadi.
+     */
+    function setScenePoster(sceneNameOrPath) {
+        if (!videoPoster) return;
+        let base = sceneNameOrPath.split('/').pop().replace(/\.mp4$/, '').replace(/\.webp$/, '');
+        videoPoster.style.backgroundImage = `url('/static/images/posters/${base}.webp')`;
+    }
+
+    /**
+     * "Zero-Black-Screen" Instant Poster-to-Motion Crossfade:
+     * 1. Tugma bosilishi bilan poster darhol qo'yiladi.
+     * 2. Yangi video 'playing' kadr berishni boshlaguncha eski video to'xtamaydi.
      */
     function smoothPlayVideo(newSrc) {
         if (!currentVideo || !nextVideo) return;
@@ -89,28 +101,30 @@ document.addEventListener('DOMContentLoaded', () => {
             targetPath += '.mp4';
         }
 
+        const filename = targetPath.split('/').pop();
+        const baseName = filename.replace('.mp4', '');
+
+        // 1. DASTLAB o'sha sahnaning posterini bir zumda qo'yamiz (Instant Poster-to-Motion)
+        setScenePoster(baseName);
+
+        // Sahna tavsif matnini darhol yangilaymiz
+        if (sceneLabel && sceneDescriptions[filename]) {
+            sceneLabel.textContent = sceneDescriptions[filename];
+            sceneLabel.style.opacity = '1';
+        }
+
         // Agar ayni paytda o'ynayotgan video bilan bir xil bo'lsa, qayta yuklamaymiz
         if (currentVideo.getAttribute('src') === targetPath || (currentVideo.currentSrc && currentVideo.currentSrc.endsWith(targetPath))) {
             return;
         }
 
-        // 1. Yangi manbani orqada turgan (nextVideo) tegga yuklaymiz
+        // 2. Yangi manbani orqada turgan (nextVideo) tegga yuklaymiz
         nextVideo.src = targetPath;
         nextVideo.muted = true;
         nextVideo.load();
 
-        // 2. Yangi video amalda o'ynab ketmaguncha ESKI VIDEONI ASLO O'CHIRMAYMIZ!
+        // 3. Yangi video amalda o'ynab ketmaguncha ESKI VIDEONI ASLO O'CHIRMAYMIZ!
         const onPlaying = () => {
-            // Sahna tavsif matnini silliq yangilash
-            const filename = targetPath.split('/').pop();
-            if (sceneLabel && sceneDescriptions[filename]) {
-                sceneLabel.style.opacity = '0';
-                setTimeout(() => {
-                    sceneLabel.textContent = sceneDescriptions[filename];
-                    sceneLabel.style.opacity = '1';
-                }, 200);
-            }
-
             // Faqatgina yangi video kadr berishni boshlaganda crossfade qilamiz
             nextVideo.classList.add('active-video');
             nextVideo.classList.remove('next-video');
@@ -143,21 +157,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function preloadVideos(videoUrlList) {
         if (!videoUrlList || !Array.isArray(videoUrlList)) return;
         videoUrlList.forEach(url => {
-            let fullUrl = url;
-            if (!fullUrl.startsWith('/static/videos/')) {
-                fullUrl = `/static/videos/${url}`;
+            let base = url.split('/').pop().replace('.mp4', '').replace('.webp', '');
+            
+            // Poster prefetch
+            const posterUrl = `/static/images/posters/${base}.webp`;
+            if (!preloadedUrls.has(posterUrl)) {
+                preloadedUrls.add(posterUrl);
+                const imgLink = document.createElement('link');
+                imgLink.rel = 'prefetch';
+                imgLink.as = 'image';
+                imgLink.href = posterUrl;
+                document.head.appendChild(imgLink);
             }
-            if (!fullUrl.endsWith('.mp4')) {
-                fullUrl += '.mp4';
-            }
-            if (preloadedUrls.has(fullUrl)) return;
-            preloadedUrls.add(fullUrl);
 
-            const link = document.createElement('link');
-            link.rel = 'prefetch';
-            link.as = 'video';
-            link.href = fullUrl;
-            document.head.appendChild(link);
+            // Video prefetch
+            const videoUrl = `/static/videos/${base}.mp4`;
+            if (!preloadedUrls.has(videoUrl)) {
+                preloadedUrls.add(videoUrl);
+                const vidLink = document.createElement('link');
+                vidLink.rel = 'prefetch';
+                vidLink.as = 'video';
+                vidLink.href = videoUrl;
+                document.head.appendChild(vidLink);
+            }
         });
     }
 
